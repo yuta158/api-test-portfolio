@@ -1,6 +1,6 @@
 # mgrep（Semantic Code Search）セットアップガイド
 
-*最終更新: 2026年02月14日*
+*最終更新: 2026年09月06日*
 
 ## 概要
 
@@ -120,7 +120,7 @@ npx @mixedbread/mgrep search "..." .
 ```
 
 **CI/CD統合:**
-- 本リポジトリでは未統合（GitHub Actionsワークフローなし）
+- GitHub Actions ワークフローには未統合（ローカル利用のみ）
 
 **.env.example:**
 - `MXBAI_API_KEY` のプレースホルダーのみ（CI連携は未設定）
