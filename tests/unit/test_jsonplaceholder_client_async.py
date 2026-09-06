@@ -1673,6 +1673,52 @@ async def test_async_get_todos_validation_error(limit, user_id, expected_error):
             await client.get_todos(limit=limit, user_id=user_id)
 
 
+@respx.mock
+async def test_async_get_todo() -> None:
+    """sync 側 test_sync_get_todo と対を成す。"""
+    mock_todo = {"id": 1, "userId": 1, "title": "delectus aut autem", "completed": False}
+
+    route = respx.get(f"{BASE_URL}/todos/1").respond(json=mock_todo)
+
+    async with AsyncJSONPlaceholderClient() as client:
+        result = await client.get_todo(1)
+
+    assert result.id == 1
+    assert result.title == "delectus aut autem"
+    assert result.completed is False
+    assert route.call_count == 1
+
+
+@respx.mock
+async def test_async_create_todo() -> None:
+    """sync 側 test_sync_create_todo と対を成す。"""
+    new_todo_response = {
+        "id": 201,
+        "title": "Buy groceries",
+        "userId": 1,
+        "completed": False,
+    }
+
+    route = respx.post(f"{BASE_URL}/todos").respond(status_code=201, json=new_todo_response)
+
+    async with AsyncJSONPlaceholderClient() as client:
+        result = await client.create_todo(title="Buy groceries", user_id=1, completed=False)
+
+        # レスポンス検証: userId -> user_id の alias マッピングと
+        # completed フィールドまで含め、全属性の契約を検証する
+        assert result.id == 201
+        assert result.title == "Buy groceries"
+        assert result.user_id == 1
+        assert result.completed is False
+    assert route.call_count == 1
+
+    # リクエストボディ検証: title/userId/completedが正しく送信されたか
+    request_body = json.loads(route.calls[0].request.content)
+    assert request_body["title"] == "Buy groceries"
+    assert request_body["userId"] == 1
+    assert request_body["completed"] is False
+
+
 @pytest.mark.parametrize(
     "user_id,expected_count,test_description",
     [
