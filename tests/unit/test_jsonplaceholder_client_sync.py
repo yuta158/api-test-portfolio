@@ -574,6 +574,30 @@ def test_sync_create_user() -> None:
 
 
 @respx.mock
+def test_sync_get_user() -> None:
+    """async 側 test_async_get_user と対を成す。"""
+    mock_user = make_mock_user(
+        1,
+        name="Leanne Graham",
+        username="Bret",
+        email="sincere@april.biz",
+        website="https://hildegard.org",
+    )
+
+    route = respx.get(f"{BASE_URL}/users/1").respond(json=mock_user)
+
+    with SyncJSONPlaceholderClient() as client:
+        result = client.get_user(1)
+
+    # async 版と同じく model_dump の往復で入れ子モデルまで含む全属性の契約を検証する
+    assert result.model_dump(by_alias=True) == mock_user
+    assert result.id == 1
+    assert result.name == "Leanne Graham"
+    assert result.email == "sincere@april.biz"
+    assert route.call_count == 1
+
+
+@respx.mock
 def test_sync_get_users() -> None:
     mock_users = [
         make_mock_user(
