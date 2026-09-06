@@ -1,9 +1,7 @@
 name: CI/CD Pipeline
 
-# Test Pyramid Strategy (Google Testing Blog):
+# Test Pyramid Strategy:
 #   Unit 70% / Integration 30%
-# Reference: .serena/memories/test_strategy_part1_overview.md
-
 # Default permissions (least privilege principle)
 # security-events: write is granted at job level where needed
 permissions:
@@ -19,7 +17,7 @@ on:
 
 jobs:
   # ============================================================
-  # Stage 1: PR Validation
+  # PR Validation
   # Triggers: pull_request
   # Tests: Unit + Integration (with coverage) → Smoke (no coverage)
   # Scope: develop/main PRs use identical strategy
@@ -110,9 +108,9 @@ jobs:
           if-no-files-found: warn
 
   # ============================================================
-  # Stage 1.1: Markdown Quality Check
+  # Markdown Quality Check
   # Triggers: pull_request
-  # Checks: markdownlint, textlint (日本語対応)
+  # Checks: markdownlint, textlint
   # ============================================================
   pr-md-quality-check:
     name: PR Markdown Quality Check
@@ -154,7 +152,7 @@ jobs:
           exit 1
 
   # ============================================================
-  # Stage 1.2: PR Trivy Scan
+  # PR Trivy Scan
   # Triggers: pull_request (develop, main)
   # Strategy:
   #   - develop: trivy fs only (fast, no Docker build)
@@ -600,7 +598,7 @@ jobs:
           }
 
   # ============================================================
-  # Stage 3: Post Validation
+  # Post Validation
   # Triggers: push to main or develop
   # Tests: Smoke
   # ============================================================
@@ -663,7 +661,7 @@ jobs:
           if-no-files-found: warn
 
   # ============================================================
-  # Stage 3.1: Post Trivy Security Scan
+  # Post Trivy Security Scan
   # Triggers: push to main or develop
   # Strategy: fs scan (dependencies) + image scan (Docker image)
   #   following pr-trivy-scan pattern for consistency
@@ -679,6 +677,7 @@ jobs:
     with:
       scan-prefix: post
       scan-image: true
+
   weekly-extended-test:
     name: Weekly Extended Test
     if: github.event_name == 'schedule'
@@ -711,7 +710,8 @@ jobs:
         run: uv run pytest -m "performance" -v
 
       - name: Run external API tests
-        id: external-tests # Used for outcome-based error handling
+        id: external-tests
+        # Used for outcome-based error handling
         # External API tests run only if performance tests completed (success or failure).
         # On cancellation, external tests are intentionally skipped to save CI costs and API rate limits.
         # Next scheduled run or manual re-run should be used to verify external API health.
@@ -757,7 +757,7 @@ jobs:
             coverage.json
 
   # ============================================================
-  # Stage 4.1: Weekly Link Check
+  # Weekly Link Check
   # Role: Detailed log collection — runs all files with continue-on-error
   #   and saves results as artifact (does not fail the workflow)
   # Counterpart: markdown-link-check.yml acts as gate check (fails on broken links)

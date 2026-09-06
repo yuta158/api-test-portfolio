@@ -49,11 +49,10 @@ dev = [
     "defusedxml>=0.7.1",              # CI JUnit XML parsing
     "genbadge[coverage]==1.1.3",  # Coverage badge生成（Q19 C3: uv.lock管理）
     "respx>=0.23.1",            # httpx用モックライブラリ
-    "socksio>=1.0.0",           # SOCKS5 proxy support for httpx
     "psutil>=6.1.1",            # tests/performance のプロセスリソース計測
     "pyyaml>=6.0",              # repo_contract テストのワークフローYAMLパース
     # 品質管理
-    "ruff>=0.16.3,<0.17",       # pre-commit frozen: v0.15.11（.pre-commit-config.yaml参照）
+    "ruff>=0.16.3,<0.17",       # pre-commit hook: v0.16.1（.pre-commit-config.yaml参照）
     "zizmor==1.29.0",
     "mypy>=2.3.0,<3.0.0",
     "bandit>=1.8.6",
